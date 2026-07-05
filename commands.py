@@ -1,6 +1,7 @@
 from repository import initialize_repository
 from parser import parse_gdfx
 from serializer import object_to_dict
+from snapshot import save_snapshot
 
 from pprint import pprint
 
@@ -19,6 +20,8 @@ def add_command(file_path):
     print(f"Opening: {file_path}")
 
     display = parse_gdfx(file_path)
+    snapshot = save_snapshot(display, "000001")
+    print(f"Snapshot saved to: {snapshot}")
     data = display.to_dict()
     pprint(data, width=120)
     print("Display Loaded Successfully!") 

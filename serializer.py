@@ -1,10 +1,6 @@
 def object_to_dict(display_object):
+    """
+    Convert a DisplayObject into a dictionary.
+    """
 
-    data = {}
-
-    data["object_id"] = display_object.object_id
-    data["object_type"] = display_object.object_type
-    data["name"] = display_object.name
-    data["parent_id"] = display_object.parent_id
-
-    return data
+    return display_object.to_dict()

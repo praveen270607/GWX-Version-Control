@@ -43,7 +43,10 @@ class DisplayObject:
 
             "properties": self.properties,
 
-            "dynamics": [],
+            "dynamics": [
+                dynamic.to_dict()
+                for dynamic in self.dynamics
+            ],
 
             "children": []
 
@@ -68,38 +71,75 @@ class DisplayObject:
         return f"{self.object_type} ({self.name})"
     
 class DynamicObject:
+    """
+    Represents one GraphWorX Dynamic.
+    Example:
+        Pick
+        Hide
+        Color
+        Rotation
+    """
 
     def __init__(self):
 
-        # Example: Pick, Hide, Color
+        # Type of Dynamic
         self.dynamic_type = ""
 
-        # Dynamic settings
+        # Dynamic properties
         self.properties = {}
 
-        # Commands like LoadDisplayCommand
+        # Commands inside the Dynamic
         self.commands = []
 
         # Optional description
         self.description = ""
 
     def add_command(self, command):
-
+        """
+        Add a command to this Dynamic.
+        """
         self.commands.append(command)
 
+    def to_dict(self):
+
+        return {
+
+            "dynamic_type": self.dynamic_type,
+
+            "description": self.description,
+
+            "properties": self.properties,
+
+            "commands": [
+                command.to_dict()
+                for command in self.commands
+            ]
+        }
+
 class CommandObject:
+    """
+    Represents one command inside a Dynamic.
+    Example:
+        LoadDisplayCommand
+        WriteValueCommand
+        SetDataPointCommand
+    """
 
     def __init__(self):
 
-        # Example:
-        # LoadDisplayCommand
-        # WriteValueCommand
-        # SetDataPointCommand
-
         self.command_type = ""
 
-        # Command settings
         self.properties = {}
 
-        # Future support
-        self.parameters = {}        
+        self.parameters = {}
+
+    def to_dict(self):
+
+        return {
+
+            "command_type": self.command_type,
+
+            "properties": self.properties,
+
+            "parameters": self.parameters
+        }      

@@ -1,4 +1,5 @@
-from models import DisplayObject, DynamicObject
+from models import DisplayObject
+from dynamic_parser import parse_dynamic
 import xml.etree.ElementTree as ET
 
 def is_dynamic_element(element_name):
@@ -90,9 +91,12 @@ def create_display_object(xml_element, parent_path=""):
         # Is this child actually a GraphWorX Dynamic?
         if is_dynamic_element(child_type):
 
-            dynamic = create_dynamic_object(child)
+            dynamic = parse_dynamic(child)
 
-            obj.dynamics.append(dynamic)
+            if dynamic is not None:
+                obj.add_dynamic(dynamic)
+
+            continue
 
         else:
 

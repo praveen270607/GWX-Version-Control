@@ -1,0 +1,195 @@
+{
+    "object_id": "/Canvas",
+    "object_type": "Canvas",
+    "name": "",
+    "parent_id": "",
+    "properties": {
+        "Background": "#FFFFFFFF",
+        "Width": "1920",
+        "Height": "1030"
+    },
+    "dynamics": [],
+    "children": [
+        {
+            "object_id": "/Canvas/Canvas.Resources[1]",
+            "object_type": "Canvas.Resources",
+            "name": "",
+            "parent_id": "/Canvas",
+            "properties": {},
+            "dynamics": [],
+            "children": [
+                {
+                    "object_id": "/Canvas/Canvas.Resources[1]/BitmapImage[1]",
+                    "object_type": "BitmapImage",
+                    "name": "",
+                    "parent_id": "/Canvas/Canvas.Resources[1]",
+                    "properties": {
+                        "{http://schemas.microsoft.com/winfx/2006/xaml}Key": "GwxThumbnailImageKey"
+                    },
+                    "dynamics": [],
+                    "children": [
+                        {
+                            "object_id": "/Canvas/Canvas.Resources[1]/BitmapImage[1]/BitmapImageInfo.StreamSource[1]",
+                            "object_type": "BitmapImageInfo.StreamSource",
+                            "name": "",
+                            "parent_id": "/Canvas/Canvas.Resources[1]/BitmapImage[1]",
+                            "properties": {},
+                            "dynamics": [],
+                            "children": [
+                                {
+                                    "object_id": "/Canvas/Canvas.Resources[1]/BitmapImage[1]/BitmapImageInfo.StreamSource[1]/Base64Stream[1]",
+                                    "object_type": "Base64Stream",
+                                    "name": "",
+                                    "parent_id": "/Canvas/Canvas.Resources[1]/BitmapImage[1]/BitmapImageInfo.StreamSource[1]",
+                                    "properties": {
+                                        "Data": "iVBORw0KGgoAAAANSUhEUgAAAQAAAACJCAYAAADDuubCAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAALhSURBVHhe7d0xLy1rAEbhOShoFAQFiUZDolSoReIH+isapUahlVCoFSIKQULCvZdMc3I5p5/1PI28u9OsmNnzjV///GcAkmbGn0CQAECYAECYAECYAECYAECYAECYAECYAECYAEDYJB8FPj09HRYWFsb1s+Xl5WFnZ2dc0DPJAJydnQ1ra2vj+tnb29uwu7s7LuhxCQBhAgBhAgBhAgBhAgBhAgBhAgBhAgBhAgBhk3wS8Pj4+Osx379ZXV0dDg4OxgU9k30t+MnJyR/PA6ysrHgMmLzJBuD8/HxYWloa1/99fHwM29vb44Im9wAgTAAgTAAgTAAgTAAgTAAgTAAgTAAgTAAgTAAgTAAgTAAgTAAgbJKnAS8uLoanp6fhT7/a/Pz8sLm5Oayvr4+fQM9kA7C4uDiun83Ozg5bW1vjgh6XABAmABAmABA2yXsA9/f3w/X19de///7O8/Pz1/sANzY2hrm5ufFT6JnsOwFvbm6G9/f3cf3u8fFx2NvbGxd0uQSAMAGAMAGAMAGAMAGAMAGAMAGAMAGAMAGAMAGAMAGAMAGAsMkeBvo8DXh7ezuu332eEjw6OhoXdE0yAJeXl8PDw8O4vvfy8iIC5E0yAFdXV8PMzJ+vbj4Dsb+/Py5ommQAPv/8v7u7G9f3Xl9fh8PDw3FB02TvAQB/51sACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMACBMAyBqGfwFRI5PIuIXciAAAAABJRU5ErkJggg=="
+                                    },
+                                    "dynamics": [],
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "object_id": "/Canvas/GwxDocument.GwxDocument[1]",
+            "object_type": "GwxDocument.GwxDocument",
+            "name": "",
+            "parent_id": "/Canvas",
+            "properties": {},
+            "dynamics": [],
+            "children": [
+                {
+                    "object_id": "/Canvas/GwxDocument.GwxDocument[1]/GwxDocument[1]",
+                    "object_type": "GwxDocument",
+                    "name": "",
+                    "parent_id": "/Canvas/GwxDocument.GwxDocument[1]",
+                    "properties": {
+                        "FileVersion": "11.4.416",
+                        "ScanRate": "500",
+                        "PlatformEditMode": "AGWeb"
+                    },
+                    "dynamics": [],
+                    "children": []
+                }
+            ]
+        },
+        {
+            "object_id": "/Canvas/StackPanel[1]",
+            "object_type": "StackPanel",
+            "name": "",
+            "parent_id": "/Canvas",
+            "properties": {
+                "Background": "#00FFFFFF",
+                "Width": "198.4",
+                "Height": "398.4",
+                "ClipToBounds": "True",
+                "Canvas.Left": "337.4",
+                "Canvas.Top": "84.6"
+            },
+            "dynamics": [],
+            "children": [
+                {
+                    "object_id": "/Canvas/StackPanel[1]/Rectangle[1]",
+                    "object_type": "Rectangle",
+                    "name": "",
+                    "parent_id": "/Canvas/StackPanel[1]",
+                    "properties": {
+                        "Fill": "#FFD8D8D8",
+                        "Stroke": "#FF000000",
+                        "Width": "78.4",
+                        "Height": "87.2",
+                        "Canvas.Left": "274.2",
+                        "Canvas.Top": "198.2"
+                    },
+                    "dynamics": [],
+                    "children": []
+                },
+                {
+                    "object_id": "/Canvas/StackPanel[1]/Rectangle[2]",
+                    "object_type": "Rectangle",
+                    "name": "",
+                    "parent_id": "/Canvas/StackPanel[1]",
+                    "properties": {
+                        "Fill": "#FFD8D8D8",
+                        "Stroke": "#FF000000",
+                        "Width": "60.8",
+                        "Height": "115.2",
+                        "Canvas.Left": "315.8",
+                        "Canvas.Top": "413.4"
+                    },
+                    "dynamics": [],
+                    "children": []
+                },
+                {
+                    "object_id": "/Canvas/StackPanel[1]/Rectangle[3]",
+                    "object_type": "Rectangle",
+                    "name": "",
+                    "parent_id": "/Canvas/StackPanel[1]",
+                    "properties": {
+                        "Fill": "#FFD8D8D8",
+                        "Stroke": "#FF000000",
+                        "Width": "73.6",
+                        "Height": "36",
+                        "Canvas.Left": "317.4",
+                        "Canvas.Top": "846.2"
+                    },
+                    "dynamics": [],
+                    "children": []
+                },
+                {
+                    "object_id": "/Canvas/StackPanel[1]/Rectangle[4]",
+                    "object_type": "Rectangle",
+                    "name": "",
+                    "parent_id": "/Canvas/StackPanel[1]",
+                    "properties": {
+                        "Fill": "#FFD8D8D8",
+                        "Stroke": "#FF000000",
+                        "Width": "52",
+                        "Height": "112",
+                        "Canvas.Left": "331.8",
+                        "Canvas.Top": "664.6"
+                    },
+                    "dynamics": [],
+                    "children": []
+                },
+                {
+                    "object_id": "/Canvas/StackPanel[1]/Rectangle1",
+                    "object_type": "Rectangle",
+                    "name": "Rectangle1",
+                    "parent_id": "/Canvas/StackPanel[1]",
+                    "properties": {
+                        "Fill": "#FFD8D8D8",
+                        "Stroke": "#FF000000",
+                        "Name": "Rectangle1",
+                        "Width": "68",
+                        "Height": "21.6",
+                        "Canvas.Left": "328.6",
+                        "Canvas.Top": "909.4"
+                    },
+                    "dynamics": [
+                        {
+                            "dynamic_type": "GwxPick",
+                            "description": "",
+                            "properties": {
+                                "LeftMouseButton": "True",
+                                "ExecuteOnUp": "True",
+                                "Control": "True"
+                            },
+                            "commands": [
+                                {
+                                    "command_type": "LoadDisplayCommand",
+                                    "properties": {},
+                                    "parameters": {}
+                                }
+                            ]
+                        }
+                    ],
+                    "children": []
+                }
+            ]
+        }
+    ]
+}
