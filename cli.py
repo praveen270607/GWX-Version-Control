@@ -1,5 +1,9 @@
 import sys
-from commands import init_command, add_command
+from commands import (
+    init_command,
+    add_command,
+    compare_command
+)
 
 def run():
     if len(sys.argv) < 2:
@@ -19,6 +23,18 @@ def run():
 
     elif command == "add":
         add_command(file_path)
+
+    elif command == "compare":
+
+        if len(sys.argv) != 4:
+            print("Usage:")
+            print("python main.py compare old.gdfx new.gdfx")
+            return
+
+        compare_command(
+            sys.argv[2],
+            sys.argv[3]
+        )
 
     else:
         print(f"Unknown command: {command}")
