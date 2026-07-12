@@ -46,6 +46,17 @@ def compare_command(old_file, new_file):
 
     new_lookup = build_lookup(new_display)
 
+    from matcher.object_matcher import ObjectMatcher
+
+    matcher = ObjectMatcher()
+
+    old_object = old_lookup["/Canvas/StackPanel[1]/Rectangle1"]
+    new_object = new_lookup["/Canvas/StackPanel[1]/Rectangle1"]
+
+    result = matcher.match_objects(old_object, new_object)
+
+    print(result.to_dict())
+    
     added, removed = compare_objects(
         old_lookup,
         new_lookup
