@@ -57,9 +57,9 @@ def compare_command(old_file, new_file):
 
     print(result.to_dict())
     
-    added, removed = compare_objects(
-        old_lookup,
-        new_lookup
+    comparison_result = compare_objects(
+    old_lookup,
+    new_lookup
     )
 
     print()
@@ -70,20 +70,20 @@ def compare_command(old_file, new_file):
 
     print("Added Objects")
 
-    if not added:
+    if not comparison_result.added:
         print("None")
     else:
-        for obj in added:
+        for obj in comparison_result.added:
             print("+", obj)
 
     print()
 
     print("Removed Objects")
 
-    if not removed:
+    if not comparison_result.removed:
         print("None")
     else:
-        for obj in removed:
+        for obj in comparison_result.removed:
             print("-", obj)    
 
   

@@ -1,20 +1,52 @@
+from comparison_result import ComparisonResult
+
+from matcher.object_pairer import ObjectPairer
+from matcher.object_matcher import ObjectMatcher
+
+
 def compare_objects(old_objects, new_objects):
     """
     Compare the objects in two displays.
     """
 
-    added = []
-    removed = []
+    # Create the final comparison result
+    comparison_result = ComparisonResult()
 
-    old_ids = set(old_objects.keys())
-    new_ids = set(new_objects.keys())
+    # Create helper objects
+    pairer = ObjectPairer()
+    matcher = ObjectMatcher()
 
-    # Objects added
-    for object_id in new_ids - old_ids:
-        added.append(object_id)
+    # Generate object pairs
+    pairs = pairer.create_pairs(
+        old_objects,
+        new_objects
+    )
 
-    # Objects removed
-    for object_id in old_ids - new_ids:
-        removed.append(object_id)
+    # Process every pair
+    for pair in pairs:
 
-    return added, removed
+        if pair.is_matched():
+
+            match_result = matcher.match_objects(
+                pair.old_object,
+                pair.new_object
+            )
+
+            pair.set_match_result(match_result)
+
+        elif pair.is_removed():
+
+            comparison_result.add_removed(
+                pair.old_object.object_id
+            )
+
+        elif pair.is_added():
+
+            comparison_result.add_added(
+                pair.new_object.object_id
+            )
+
+        # Always store the pair
+        comparison_result.add_pair(pair)
+
+    return comparison_result
