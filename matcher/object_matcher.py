@@ -1,3 +1,6 @@
+from matcher.evaluators.position_evaluator import PositionEvaluator
+from matcher.evaluators.size_evaluator import SizeEvaluator
+from matcher.evaluators.appearance_evaluator import AppearanceEvaluator
 from matcher.match_result import MatchResult
 from matcher.evaluators.object_type_evaluator import ObjectTypeEvaluator
 from matcher.evaluators.name_evaluator import NameEvaluator
@@ -9,8 +12,12 @@ class ObjectMatcher:
     def __init__(self):
 
         self.evaluators = [
+            
             ObjectTypeEvaluator(),
-            NameEvaluator()
+            NameEvaluator(),
+            SizeEvaluator(),
+            PositionEvaluator(),
+            AppearanceEvaluator()
         ]
 
     def match_objects(self, old_object, new_object):

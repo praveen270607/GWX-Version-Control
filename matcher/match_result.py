@@ -16,6 +16,7 @@ class MatchResult:
         self.name_score = 0
         self.parent_score = 0
         self.position_score = 0
+        self.appearance_score = 0
         self.size_score = 0
         self.dynamic_score = 0
         self.command_score = 0
@@ -23,6 +24,10 @@ class MatchResult:
         # References
         self.old_object = None
         self.new_object = None
+
+        self.changed_properties = []
+
+        self.appearance_score = 0
 
     def to_dict(self):
 
