@@ -12,20 +12,20 @@ class DynamicMatchResult:
 
         self.differences = []
 
+        self.pairs = []
+
     def calculate_total(self):
 
         self.total_score = (
-
             self.structure_score +
-
             self.command_score +
-
             self.parameter_score
         )
 
-    def add_difference(
-        self,
-        difference
-    ):
+    def add_difference(self, difference):
 
         self.differences.append(difference)
+
+    def add_pair(self, pair):
+
+        self.pairs.append(pair)

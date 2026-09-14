@@ -4,14 +4,17 @@ class DifferencePath:
 
         self.segments = []
 
-    def add(self, segment):
+    def push(self, segment):
 
         self.segments.append(segment)
 
-    def remove_last(self):
+    def pop(self):
 
         if self.segments:
-            self.segments.pop()
+
+            return self.segments.pop()
+
+        return None
 
     def clear(self):
 
