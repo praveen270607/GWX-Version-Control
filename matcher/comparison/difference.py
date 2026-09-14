@@ -30,5 +30,19 @@ class Difference:
             f"{self.difference_type.value} "
             f"{self.level.value} "
             f"at {self.path} "
-            f"({self.old_value} -> {self.new_value})"
+            f"({self.format_value(self.old_value)} -> "
+            f"{self.format_value(self.new_value)})"
         )
+
+    @staticmethod
+    def format_value(value):
+
+        if value is None:
+            return "None"
+
+        value = str(value)
+
+        if len(value) <= 120:
+            return value
+
+        return f"{value[:117]}..."

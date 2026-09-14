@@ -1,55 +1,85 @@
-from matcher.dynamic.dynamic_matcher import DynamicMatcher
+import unittest
+
 from matcher.comparison.comparison_context import ComparisonContext
+from matcher.dynamic.dynamic_matcher import DynamicMatcher
+from models import CommandObject, DynamicObject
 
 
-class FakeDynamic:
+def make_dynamic(dynamic_type, properties=None, commands=None):
 
-    def __init__(self, dynamic_type):
+    dynamic = DynamicObject()
+    dynamic.dynamic_type = dynamic_type
+    dynamic.properties = properties or {}
+    dynamic.commands = commands or []
 
-        self.dynamic_type = dynamic_type
+    return dynamic
 
 
-def test_dynamic_matching():
+def make_command(command_type, properties=None, parameters=None):
 
-    old_dynamics = [
+    command = CommandObject()
+    command.command_type = command_type
+    command.properties = properties or {}
+    command.parameters = parameters or {}
 
-        FakeDynamic("Pick"),
-        FakeDynamic("Hide"),
-        FakeDynamic("Color")
+    return command
 
-    ]
 
-    new_dynamics = [
+class TestDynamicMatcher(unittest.TestCase):
 
-        FakeDynamic("Pick"),
-        FakeDynamic("Color"),
-        FakeDynamic("Rotation")
+    def test_pairs_and_reports_added_removed_dynamics(self):
 
-    ]
+        result = DynamicMatcher().match(
+            [make_dynamic("Pick"), make_dynamic("Hide")],
+            [make_dynamic("Pick"), make_dynamic("Rotation")],
+            ComparisonContext()
+        )
 
-    context = ComparisonContext()
+        self.assertEqual(len(result.pairs), 3)
+        self.assertEqual(
+            [str(difference) for difference in result.differences],
+            [
+                "Removed Dynamic at Hide (Hide -> None)",
+                "Added Dynamic at Rotation (None -> Rotation)"
+            ]
+        )
 
-    context.current_path.push("Rectangle1")
+    def test_reports_dynamic_and_command_parameter_changes(self):
 
-    matcher = DynamicMatcher()
+        old_dynamic = make_dynamic(
+            "GwxPick",
+            {"ExecuteOnUp": "True"},
+            [make_command("LoadDisplayCommand", {"Target": "A"})]
+        )
+        new_dynamic = make_dynamic(
+            "GwxPick",
+            {"ExecuteOnUp": "False"},
+            [
+                make_command("LoadDisplayCommand", {"Target": "B"}),
+                make_command("WriteValueCommand")
+            ]
+        )
 
-    result = matcher.match(
-        old_dynamics,
-        new_dynamics,
-        context
-    )
+        result = DynamicMatcher().match(
+            [old_dynamic],
+            [new_dynamic],
+            ComparisonContext()
+        )
 
-    for difference in result.differences:
-
-        print(
-            difference.difference_type.value,
-            difference.level.value,
-            difference.path,
-            difference.old_value,
-            difference.new_value
+        self.assertEqual(len(result.pairs), 1)
+        self.assertEqual(
+            len(result.pairs[0].match_result.differences),
+            3
+        )
+        self.assertEqual(
+            [str(difference) for difference in result.differences],
+            [
+                "Modified Property at GwxPick/ExecuteOnUp (True -> False)",
+                "Modified Parameter at GwxPick/LoadDisplayCommand/Target (A -> B)",
+                "Added Command at GwxPick/WriteValueCommand (None -> WriteValueCommand)"
+            ]
         )
 
 
 if __name__ == "__main__":
-
-    test_dynamic_matching()
+    unittest.main()

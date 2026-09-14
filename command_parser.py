@@ -31,6 +31,8 @@ def find_commands(xml_element, commands):
 
             command.properties = dict(child.attrib)
 
+            command.parameters = parse_parameters(child)
+
             commands.append(command)
 
         # Keep searching deeper
@@ -43,3 +45,31 @@ def clean_tag(tag):
         return tag.split("}", 1)[1]
 
     return tag
+
+
+def parse_parameters(command_xml):
+    """
+    Flatten attributes inside a command into named parameters.
+
+    Command attributes remain in ``properties``. Attributes nested below the
+    command are parameters, and their XML path keeps similarly named values
+    unambiguous.
+    """
+
+    parameters = {}
+
+    def visit(element, path):
+
+        for child in element:
+
+            tag = clean_tag(child.tag)
+            child_path = f"{path}/{tag}"
+
+            for name, value in child.attrib.items():
+                parameters[f"{child_path}/{name}"] = value
+
+            visit(child, child_path)
+
+    visit(command_xml, "")
+
+    return parameters

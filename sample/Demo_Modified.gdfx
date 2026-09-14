@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Canvas Background="#FFFFFFFF" Width="1920" Height="1030" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:iwm="clr-namespace:Ico.Windows.Media;assembly=IcoWPF" xmlns:gwx="clr-namespace:Ico.Gwx;assembly=GwxRuntimeCore" xmlns:gwxcmd="clr-namespace:Ico.Gwx;assembly=GwxRuntimeCoreCommands">
+<Canvas Background="#FFFFFFFF" Width="1920" Height="1030" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:iwm="clr-namespace:Ico.Windows.Media;assembly=IcoWPF" xmlns:gwx="clr-namespace:Ico.Gwx;assembly=GwxRuntimeCore" xmlns:gwxcmd="clr-namespace:Ico.Gwx;assembly=GwxRuntimeCoreCommands" xmlns:ia="clr-namespace:Ico.Awx;assembly=AwxViewControl" xmlns:iws="clr-namespace:Ico.WPF.Specialized;assembly=IcoWPFSpecialized" xmlns:iac="clr-namespace:Ico.Awx.Common;assembly=AwxClientCommon" xmlns:iwc="clr-namespace:Ico.Windows.Controls;assembly=IcoWPF" xmlns:iad="clr-namespace:Ico.Awx.DataGrid;assembly=AwxViewControl" xmlns:s="clr-namespace:System;assembly=mscorlib">
   <Canvas.Resources>
     <BitmapImage x:Key="GwxThumbnailImageKey">
       <iwm:BitmapImageInfo.StreamSource>
-        <iwm:Base64Stream Data="iVBORw0KGgoAAAANSUhEUgAAAQAAAACJCAYAAADDuubCAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKmSURBVHhe7dyhSiZRAIbhoyaLRVRQMKlBECwGs7fo1QgWqxegwSwmg4JBkN1VThHW3T7v85Thmwt4+c/PzKz8+mMASavzCgQJAIQJAIQJAIQJAIQJAIQJAIQJAIQJAIQJAIQt8lHgq6ursb6+PtfPNjc3x/Hx8VzQs8gA3NzcjJ2dnbl+9v7+Pk5OTuaCHkcACBMACBMACBMACBMACBMACBMACBMACBMACFvkk4CXl5dfj/n+z/b29ri4uJgLehYZgOvr67GysjLXz/b398fBwcFc0LPIANze3o6NjY25fra2tiYApPkPAMIEAMIWewR4e3sbr6+v8853q6urY2tra+zu7o69vb15F3oWGYBPDw8P4+PjY67vXl5extnZ2VzQ5QgAYQIAYQIAYQIAYQIAYQIAYQIAYQIAYQIAYQIAYQIAYQIAYQIAYYt8G/D5+Xnc399/Xf/m83Nhh4eH4+joaN6BpkUG4O7u7uud/3/5jMP5+flc0OQIAGGL/AXw9PQ0Hh8f5/q7z18Ip6enc0HTYr8IBPyfIwCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQCECQBkjfEbiZhp18ideaYAAAAASUVORK5CYII=" />
+        <iwm:Base64Stream Data="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" />
       </iwm:BitmapImageInfo.StreamSource>
     </BitmapImage>
   </Canvas.Resources>
@@ -20,7 +20,7 @@
           <gwx:GwxDynamicGroup.DynamicsList>
             <gwx:GwxPick LeftMouseButton="True" ExecuteOnUp="True" Control="True">
               <gwx:GwxPick.CommandParameters>
-                <gwxcmd:LoadDisplayCommand />
+                <gwxcmd:LoadDisplayCommand GlobalAliases="#wq=1/2;" />
               </gwx:GwxPick.CommandParameters>
             </gwx:GwxPick>
           </gwx:GwxDynamicGroup.DynamicsList>
@@ -28,4 +28,63 @@
       </gwx:GwxDynamicGroup.GwxDynamicGroup>
     </Rectangle>
   </StackPanel>
+  <ia:AwxViewControl FileVersion="11.4.416" FontFamily="Segoe UI" FontSize="12" Width="515" Height="499" Canvas.Left="665" Canvas.Top="214">
+    <ia:AwxViewControl.SubscriptionsRepository>
+      <iac:AlarmSubscription Key="62117644" Name="New Subscription">
+        <iac:AlarmSubscription.Fields>
+          <iac:EventField GroupMap="8" GroupKey="" EventName="BaseEventType" Name="EventId" ConversionBuiltInType="Byte" BuiltInType="Byte" IsArray="True" />
+          <iac:EventField GroupMap="12" GroupKey="" EventName="BaseEventType" Name="SourceName" />
+          <iac:EventField GroupMap="7" GroupKey="" EventName="BaseEventType" Name="EventClass" ConversionBuiltInType="UInt32" BuiltInType="UInt32" />
+          <iac:EventField GroupMap="9" GroupKey="" EventName="BaseEventType" Name="EventType" />
+          <iac:EventField GroupMap="11" GroupKey="" EventName="BaseEventType" Name="Severity" ConversionBuiltInType="UInt16" BuiltInType="UInt16" />
+          <iac:EventField GroupKey="" EventName="BaseConditionType" Name="AckRequired" ConversionBuiltInType="UInt32" BuiltInType="UInt32" />
+          <iac:EventField GroupMap="1" GroupKey="" EventName="BaseConditionType" Name="ActiveTime" ConversionBuiltInType="DateTime" BuiltInType="DateTime" />
+          <iac:EventField GroupMap="10" GroupKey="" EventName="BaseEventType" Name="Message" />
+          <iac:EventField GroupMap="3" GroupKey="" EventName="BaseConditionType" Name="NewState" ConversionBuiltInType="UInt32" BuiltInType="UInt32" />
+          <iac:EventField GroupMap="5" GroupKey="" EventName="BaseConditionType" Name="StatusCode" ConversionBuiltInType="StatusCode" BuiltInType="StatusCode" />
+          <iac:EventField GroupMap="4" GroupKey="" EventName="BaseConditionType" Name="OriginalSource" />
+          <iac:EventField GroupMap="2" GroupKey="" EventName="BaseConditionType" Name="ConditionName" />
+          <iac:EventField GroupMap="6" GroupKey="" EventName="BaseConditionType" Name="SubConditionName" />
+          <iac:EventField GroupMap="13" GroupKey="" EventName="OpcAEType" Name="Category" ConversionBuiltInType="UInt32" BuiltInType="UInt32" />
+          <iac:EventField GroupMap="14" GroupKey="AREA" EventName="OpcAEType:ICONICS.AlarmSvr.1.Limit" Name="AREA" IsArray="True" />
+          <iac:EventField GroupMap="14" GroupKey="AREA" EventName="OpcAEType:ICONICS.AlarmSvr.1.Digital" Name="AREA" IsArray="True" />
+          <iac:EventField GroupMap="14" GroupKey="AREA" EventName="OpcAEType:ICONICS.AlarmSvr.1.Deviation" Name="AREA" IsArray="True" />
+          <iac:EventField GroupMap="14" GroupKey="AREA" EventName="OpcAEType:ICONICS.AlarmSvr.1.Rate_of_Change" Name="AREA" IsArray="True" />
+          <iac:EventField GroupMap="14" GroupKey="AREA" EventName="OpcAEType:ICONICS.AlarmSvr.1.Rate_Limit" Name="AREA" IsArray="True" />
+          <iac:EventField GroupMap="14" GroupKey="AREA" EventName="OpcAEType:ICONICS.AlarmSvr.1.Trigger" Name="AREA" IsArray="True" />
+        </iac:AlarmSubscription.Fields>
+        <iac:AlarmSubscription.Points>
+          <iac:EventPoint DisplayName="Local Alarm Server" Tag="ae:" />
+        </iac:AlarmSubscription.Points>
+      </iac:AlarmSubscription>
+    </ia:AwxViewControl.SubscriptionsRepository>
+    <ia:AwxViewControl.Items>
+      <iwc:MultipleTabItem IsSelected="True" Header="Tab">
+        <iad:AwxGridView AllowGrouping="False" AllowColumnResize="False" SelectionMode="Extended" SubscriptionID="62117644" Uid="local:AwxView_1">
+          <iad:AwxGridView.Details>
+            <s:String>Total Alarms: {Total} - Active: {Active} - Normal: {NotAcked}</s:String>
+            <s:String>Visible Alarms: {VisibleTotal} - Active: {VisibleActive} -Normal: {VisibleNotAcked}</s:String>
+            <s:String>Total Groups: {Groups}</s:String>
+          </iad:AwxGridView.Details>
+          <iad:AwxGridView.Columns>
+            <iad:AwxColumn Key="AckRequiredBaseConditionType" Index="11" IsVisible="False" Format="{x:Null}" Text="Ack Required" />
+            <iad:AwxColumn Key="ActiveTimeBaseConditionType" Format="{x:Null}" Text="Time / Date" Width="145" />
+            <iad:AwxColumn Key="ConditionNameBaseConditionType" Index="13" IsVisible="False" Format="{x:Null}" Text="Condition Name" />
+            <iad:AwxColumn DictionaryKey="NewStateTranslation" Key="NewStateBaseConditionType" Index="12" IsVisible="False" Format="{x:Null}" Text="New State" />
+            <iad:AwxColumn Key="OriginalSourceBaseConditionType" Index="1" Format="{x:Null}" Text="Tag" Width="155" />
+            <iad:AwxColumn Key="StatusCodeBaseConditionType" Index="4" Format="{x:Null}" Text="Quality" Width="65" />
+            <iad:AwxColumn Key="SubConditionNameBaseConditionType" Index="3" Format="{x:Null}" Text="Type" Width="125" />
+            <iad:AwxColumn DictionaryKey="EventTypeTranslation" Key="EventClassBaseEventType" Index="9" IsVisible="False" Format="{x:Null}" Text="Event Class" />
+            <iad:AwxColumn Key="EventIdBaseEventType" Index="7" IsVisible="False" Format="{x:Null}" Text="Event ID" />
+            <iad:AwxColumn Key="EventTypeBaseEventType" Index="10" IsVisible="False" Format="{x:Null}" Text="Event Type" />
+            <iad:AwxColumn Key="MessageBaseEventType" Index="5" Format="{x:Null}" Text="Description" />
+            <iad:AwxColumn Key="SeverityBaseEventType" Index="2" Format="{x:Null}" Text="Priority" Width="65" />
+            <iad:AwxColumn Key="SourceNameBaseEventType" Index="8" IsVisible="False" Format="{x:Null}" Text="Source Name" />
+            <iad:AwxColumn DictionaryKey="CategoryTranslation" Key="CategoryOpcAEType" Index="14" IsVisible="False" Format="{x:Null}" Text="Category" />
+            <iad:AwxColumn Key="AREAInternal" Index="6" IsVisible="False" Format="{x:Null}" Text="Area" />
+          </iad:AwxGridView.Columns>
+        </iad:AwxGridView>
+      </iwc:MultipleTabItem>
+    </ia:AwxViewControl.Items>
+  </ia:AwxViewControl>
 </Canvas>
