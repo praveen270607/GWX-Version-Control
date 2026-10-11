@@ -69,8 +69,6 @@ def create_display_object(xml_element, parent_path=""):
 
         child_type = clean_tag(child.tag)
 
-        print(child_type)
-
         if child_type not in child_counts:
             child_counts[child_type] = 1
         else:

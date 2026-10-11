@@ -2,6 +2,7 @@ from comparison_result import ComparisonResult
 
 from matcher.object_pairer import ObjectPairer
 from matcher.object_matcher import ObjectMatcher
+from matcher.comparison.comparison_context import ComparisonContext
 
 
 def compare_objects(old_objects, new_objects):
@@ -29,10 +30,20 @@ def compare_objects(old_objects, new_objects):
 
             match_result = matcher.match_objects(
                 pair.old_object,
-                pair.new_object
+                pair.new_object,
+                ComparisonContext()
             )
 
             pair.set_match_result(match_result)
+
+            if match_result.differences:
+                comparison_result.add_modified(
+                    pair.old_object.object_id
+                )
+            else:
+                comparison_result.add_unchanged(
+                    pair.old_object.object_id
+                )
 
         elif pair.is_removed():
 

@@ -1,11 +1,20 @@
-from repository import initialize_repository
+from repository import (
+    checkout_branch,
+    commit,
+    create_branch,
+    initialize_repository,
+    list_branches,
+    merge_branch,
+    restore_file,
+    show_log,
+    stage_file,
+    stage_remove,
+    staged_comparison_paths,
+    status
+)
 from parser import parse_gdfx
-from serializer import object_to_dict
-from snapshot import save_snapshot
 from lookup import build_lookup
 from compare_engine import compare_objects
-
-from pprint import pprint
 
 def init_command():
     """
@@ -14,21 +23,47 @@ def init_command():
     initialize_repository()
 
 def add_command(file_path):
+    stage_file(file_path)
 
-    if file_path is None:
-        print("Please provide a GraphWorX file.")
-        return
 
-    print(f"Opening: {file_path}")
+def status_command():
+    status()
 
-    display = parse_gdfx(file_path)
-    snapshot = save_snapshot(display, "000001")
-    print(f"Snapshot saved to: {snapshot}")
-    data = display.to_dict()
-    pprint(data, width=120)
-    print("Display Loaded Successfully!") 
-    # print(f"Root Object : {display.object_type}")
-    # print(f"Object ID   : {display.object_id}")
+
+def branch_command(branch_name):
+    if branch_name is None:
+        list_branches()
+    else:
+        create_branch(branch_name)
+
+
+def checkout_command(branch_name, force=False):
+    checkout_branch(branch_name, force=force)
+
+
+def commit_command(message):
+    commit(message)
+
+
+def diff_command(file_path):
+    old_file, new_file = staged_comparison_paths(file_path)
+    compare_command(old_file, new_file)
+
+
+def remove_command(file_path):
+    stage_remove(file_path)
+
+
+def restore_command(file_path):
+    restore_file(file_path)
+
+
+def log_command():
+    show_log()
+
+
+def merge_command(branch_name):
+    merge_branch(branch_name)
 
 def compare_command(old_file, new_file):
 
@@ -46,20 +81,9 @@ def compare_command(old_file, new_file):
 
     new_lookup = build_lookup(new_display)
 
-    from matcher.object_matcher import ObjectMatcher
-
-    matcher = ObjectMatcher()
-
-    old_object = old_lookup["/Canvas/StackPanel[1]/Rectangle1"]
-    new_object = new_lookup["/Canvas/StackPanel[1]/Rectangle1"]
-
-    result = matcher.match_objects(old_object, new_object)
-
-    print(result.to_dict())
-    
     comparison_result = compare_objects(
-    old_lookup,
-    new_lookup
+        old_lookup,
+        new_lookup
     )
 
     print()
@@ -84,6 +108,28 @@ def compare_command(old_file, new_file):
         print("None")
     else:
         for obj in comparison_result.removed:
-            print("-", obj)    
+            print("-", obj)
 
-  
+    print()
+
+    print("Modified Objects")
+
+    if not comparison_result.modified:
+        print("None")
+    else:
+        for pair in comparison_result.pairs:
+            if pair.is_matched() and pair.match_result.differences:
+                print("~", pair.old_object.object_id)
+                for difference in pair.match_result.differences:
+                    print("  ", difference)
+
+    print()
+
+    print("Unchanged Objects")
+
+    if not comparison_result.unchanged:
+        print("None")
+    else:
+        for obj in comparison_result.unchanged:
+            print("=", obj)
+

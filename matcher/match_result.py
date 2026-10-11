@@ -27,6 +27,9 @@ class MatchResult:
 
         self.changed_properties = []
 
+        # Detailed differences found while comparing the objects.
+        self.differences = []
+
         self.appearance_score = 0
 
     def to_dict(self):
@@ -49,5 +52,10 @@ class MatchResult:
 
             "dynamic_score": self.dynamic_score,
 
-            "command_score": self.command_score
+            "command_score": self.command_score,
+
+            "differences": [
+                str(difference)
+                for difference in self.differences
+            ]
         }
