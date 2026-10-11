@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gwx-version-control"
+version = "0.1.0"
+description = "Semantic local version control for ICONICS GraphWorX files"
+requires-python = ">=3.10"
+
+[project.scripts]
+gwx = "cli:run"
+
+[tool.setuptools]
+py-modules = [
+  "cli", "commands", "repository", "parser", "models", "lookup",
+  "compare_engine", "comparison_result", "command_parser", "dynamic_parser"
+]
+
+[tool.setuptools.packages.find]
+include = ["matcher*"]

@@ -11,8 +11,11 @@ from repository import (
     get_branch_head,
     initialize_repository,
     load_index,
+    merge_branch,
+    restore_file,
     save_index,
     stage_file,
+    stage_remove,
 )
 
 
@@ -87,6 +90,66 @@ class TestRepositoryWorkflow(unittest.TestCase):
 
         checkout_branch("main", self.root)
         self.assertEqual(get_branch_head(root=self.root), "000001")
+
+    def test_checkout_restores_branch_version_and_protects_dirty_file(self):
+
+        stage_file(self.display, self.root)
+        commit("Add pump display", self.root)
+        create_branch("feature", self.root)
+
+        self.display.write_text("uncommitted", encoding="utf-8")
+        with self.assertRaisesRegex(RepositoryError, "uncommitted changes"):
+            checkout_branch("feature", self.root)
+
+        restore_file(self.display, self.root)
+        checkout_branch("feature", self.root)
+        self.assertEqual(self.display.read_text(encoding="utf-8"), "version one")
+
+    def test_fast_forward_merge_restores_the_newer_file(self):
+
+        stage_file(self.display, self.root)
+        commit("Add pump display", self.root)
+        create_branch("feature", self.root)
+        checkout_branch("feature", self.root)
+
+        self.display.write_text("feature version", encoding="utf-8")
+        stage_file(self.display, self.root)
+        commit("Feature update", self.root)
+
+        checkout_branch("main", self.root)
+        merge_branch("feature", self.root)
+
+        self.assertEqual(get_branch_head(root=self.root), "000002")
+        self.assertEqual(self.display.read_text(encoding="utf-8"), "feature version")
+
+    def test_merge_rejects_two_changes_to_the_same_file(self):
+
+        stage_file(self.display, self.root)
+        commit("Add pump display", self.root)
+        create_branch("feature", self.root)
+        checkout_branch("feature", self.root)
+
+        self.display.write_text("feature version", encoding="utf-8")
+        stage_file(self.display, self.root)
+        commit("Feature update", self.root)
+
+        checkout_branch("main", self.root)
+        self.display.write_text("main version", encoding="utf-8")
+        stage_file(self.display, self.root)
+        commit("Main update", self.root)
+
+        with self.assertRaisesRegex(RepositoryError, "both branches changed"):
+            merge_branch("feature", self.root)
+
+    def test_commit_can_remove_a_tracked_file(self):
+
+        stage_file(self.display, self.root)
+        commit("Add pump display", self.root)
+        stage_remove(self.display, self.root)
+        self.assertFalse(self.display.exists())
+        commit("Remove pump display", self.root)
+
+        self.assertNotIn("Displays/Pump.gdfx", current_tree(self.root))
 
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@
 
 from cli import run
 
-run()
+raise SystemExit(run())
 
 # from parser import is_dynamic_element
 

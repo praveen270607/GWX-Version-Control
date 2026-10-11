@@ -4,7 +4,11 @@ from repository import (
     create_branch,
     initialize_repository,
     list_branches,
+    merge_branch,
+    restore_file,
+    show_log,
     stage_file,
+    stage_remove,
     staged_comparison_paths,
     status
 )
@@ -33,8 +37,8 @@ def branch_command(branch_name):
         create_branch(branch_name)
 
 
-def checkout_command(branch_name):
-    checkout_branch(branch_name)
+def checkout_command(branch_name, force=False):
+    checkout_branch(branch_name, force=force)
 
 
 def commit_command(message):
@@ -44,6 +48,22 @@ def commit_command(message):
 def diff_command(file_path):
     old_file, new_file = staged_comparison_paths(file_path)
     compare_command(old_file, new_file)
+
+
+def remove_command(file_path):
+    stage_remove(file_path)
+
+
+def restore_command(file_path):
+    restore_file(file_path)
+
+
+def log_command():
+    show_log()
+
+
+def merge_command(branch_name):
+    merge_branch(branch_name)
 
 def compare_command(old_file, new_file):
 

@@ -114,11 +114,27 @@ def list_branches(root=None):
         print(f"{marker} {name} {head}")
 
 
-def checkout_branch(branch_name, root=None):
-    """Switch the active branch without overwriting the user's working files."""
+def checkout_branch(branch_name, root=None, force=False):
+    """Switch branches and restore tracked files without discarding local edits."""
 
     ensure_repository(root)
-    get_branch_head(branch_name, root)
+    target_head = get_branch_head(branch_name, root)
+
+    if branch_name == current_branch(root):
+        print(f"Already on branch '{branch_name}'.")
+        return
+
+    if load_index(root) and not force:
+        raise RepositoryError("Cannot checkout with staged changes. Commit or unstage them first.")
+
+    changed_files = working_changes(root)
+    if changed_files and not force:
+        raise RepositoryError(
+            "Cannot checkout because tracked files have uncommitted changes: "
+            + ", ".join(changed_files)
+        )
+
+    write_working_tree(load_tree(target_head, root), root)
 
     repo = repository_path(root)
     (repo / "HEAD").write_text(branch_name, encoding="utf-8")
@@ -128,8 +144,7 @@ def checkout_branch(branch_name, root=None):
     config["current_branch"] = branch_name
     write_json(config_file, config)
 
-    print(f"Switched to branch '{branch_name}'.")
-    print("Working files were not replaced; stage the files you want to commit.")
+    print(f"Switched to branch '{branch_name}' at {target_head or '(no commits)'}.")
 
 
 def stage_file(file_path, root=None):
@@ -164,6 +179,31 @@ def stage_file(file_path, root=None):
         print(f"Staged update to {relative_path} based on revision {base_revision}.")
 
 
+def stage_remove(file_path, root=None):
+    """Stage deletion of a file currently tracked by the active branch."""
+
+    ensure_repository(root)
+    root = Path(root or Path.cwd()).resolve()
+    relative_path = normalise_relative_path(file_path, root)
+    tree = current_tree(root)
+
+    if relative_path not in tree:
+        raise RepositoryError(f"File is not tracked: {relative_path}")
+
+    index = load_index(root)
+    index[relative_path] = {
+        "base_revision": tree[relative_path]["revision"],
+        "new_blob": None
+    }
+    save_index(index, root)
+
+    source = root / relative_path
+    if source.exists():
+        source.unlink()
+
+    print(f"Staged deletion: {relative_path}")
+
+
 def status(root=None):
 
     ensure_repository(root)
@@ -181,7 +221,14 @@ def status(root=None):
     print("Staged changes:")
     for path, entry in sorted(index.items()):
         base = entry["base_revision"] or "new file"
-        print(f"  {path} (base: {base})")
+        action = "delete" if entry["new_blob"] is None else "update"
+        print(f"  {action}: {path} (base: {base})")
+
+    changed_files = working_changes(root)
+    if changed_files:
+        print("Unstaged tracked changes:")
+        for path in changed_files:
+            print(f"  {path}")
 
 
 def commit(message, root=None):
@@ -219,10 +266,13 @@ def commit(message, root=None):
 
         commit_id = next_commit_id(root)
         for path, entry in index.items():
-            tree[path] = {
-                "blob": entry["new_blob"],
-                "revision": commit_id
-            }
+            if entry["new_blob"] is None:
+                tree.pop(path, None)
+            else:
+                tree[path] = {
+                    "blob": entry["new_blob"],
+                    "revision": commit_id
+                }
 
         commit_data = {
             "id": commit_id,
@@ -237,6 +287,42 @@ def commit(message, root=None):
         save_index({}, root)
 
     print(f"Committed {commit_id}: {message}")
+
+
+def show_log(root=None):
+
+    ensure_repository(root)
+    commit_id = get_branch_head(root=root)
+
+    if commit_id is None:
+        print("No commits yet.")
+        return
+
+    while commit_id is not None:
+        data = load_commit(commit_id, root)
+        print(f"{data['id']} {data['created_at']} {data['message']}")
+        commit_id = data.get("parent")
+
+
+def restore_file(file_path, root=None):
+    """Restore a tracked file from the current branch HEAD."""
+
+    ensure_repository(root)
+    root = Path(root or Path.cwd()).resolve()
+    relative_path = normalise_relative_path(file_path, root)
+
+    if relative_path in load_index(root):
+        raise RepositoryError("Cannot restore a staged file. Commit or unstage it first.")
+
+    tree = current_tree(root)
+    entry = tree.get(relative_path)
+    if entry is None:
+        raise RepositoryError(f"File is not tracked at HEAD: {relative_path}")
+
+    destination = root / relative_path
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(blob_path(entry["blob"], root), destination)
+    print(f"Restored {relative_path} from revision {entry['revision']}.")
 
 
 def staged_comparison_paths(file_path, root=None):
@@ -273,7 +359,201 @@ def load_tree(commit_id, root=None):
     if commit_id is None:
         return {}
 
-    return read_json(repository_path(root) / "commits" / f"{commit_id}.json")["tree"]
+    return load_commit(commit_id, root)["tree"]
+
+
+def load_commit(commit_id, root=None):
+
+    commit_file = repository_path(root) / "commits" / f"{commit_id}.json"
+    if not commit_file.exists():
+        raise RepositoryError(f"Commit '{commit_id}' is missing.")
+
+    return read_json(commit_file)
+
+
+def merge_branch(branch_name, root=None):
+    """Fast-forward or three-way merge a branch without overwriting conflicts."""
+
+    ensure_repository(root)
+    current = current_branch(root)
+    if branch_name == current:
+        raise RepositoryError("Cannot merge a branch into itself.")
+
+    if load_index(root):
+        raise RepositoryError("Cannot merge with staged changes. Commit or unstage them first.")
+
+    changed_files = working_changes(root)
+    if changed_files:
+        raise RepositoryError(
+            "Cannot merge with uncommitted tracked changes: " + ", ".join(changed_files)
+        )
+
+    ours = get_branch_head(current, root)
+    theirs = get_branch_head(branch_name, root)
+
+    if theirs is None:
+        print(f"Nothing to merge from '{branch_name}'.")
+        return
+
+    if ours is None or is_ancestor(ours, theirs, root):
+        write_working_tree(load_tree(theirs, root), root)
+        write_json(branch_ref_path(current, root), {"head": theirs})
+        print(f"Fast-forwarded '{current}' to {theirs}.")
+        return
+
+    if is_ancestor(theirs, ours, root):
+        print("Already up to date.")
+        return
+
+    base = common_ancestor(ours, theirs, root)
+    merged_tree, conflicts = merge_trees(
+        load_tree(base, root),
+        load_tree(ours, root),
+        load_tree(theirs, root)
+    )
+
+    if conflicts:
+        raise RepositoryError(
+            "Merge stopped because both branches changed the same file(s): "
+            + ", ".join(conflicts)
+            + ". Resolve the display manually, compare it, then stage and commit it."
+        )
+
+    with commit_lock(root):
+        if get_branch_head(current, root) != ours:
+            raise RepositoryError("Branch changed while merging. Try again.")
+
+        commit_id = next_commit_id(root)
+        data = {
+            "id": commit_id,
+            "parent": ours,
+            "merge_parent": theirs,
+            "branch": current,
+            "message": f"Merge branch '{branch_name}'",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "tree": merged_tree
+        }
+        write_json(repository_path(root) / "commits" / f"{commit_id}.json", data)
+        write_working_tree(merged_tree, root)
+        write_json(branch_ref_path(current, root), {"head": commit_id})
+
+    print(f"Merged '{branch_name}' into '{current}' as {commit_id}.")
+
+
+def merge_trees(base, ours, theirs):
+
+    merged = {}
+    conflicts = []
+
+    for path in sorted(set(base) | set(ours) | set(theirs)):
+        base_entry = base.get(path)
+        our_entry = ours.get(path)
+        their_entry = theirs.get(path)
+        base_blob = entry_blob(base_entry)
+        our_blob = entry_blob(our_entry)
+        their_blob = entry_blob(their_entry)
+
+        if our_blob == their_blob:
+            selected = our_entry
+        elif base_blob == our_blob:
+            selected = their_entry
+        elif base_blob == their_blob:
+            selected = our_entry
+        else:
+            conflicts.append(path)
+            continue
+
+        if selected is not None:
+            merged[path] = selected
+
+    return merged, conflicts
+
+
+def entry_blob(entry):
+
+    return entry["blob"] if entry is not None else None
+
+
+def is_ancestor(ancestor, descendant, root=None):
+
+    return ancestor in ancestors_of(descendant, root)
+
+
+def common_ancestor(first, second, root=None):
+
+    first_ancestors = ancestors_of(first, root)
+    for commit_id in commit_walk(second, root):
+        if commit_id in first_ancestors:
+            return commit_id
+
+    return None
+
+
+def ancestors_of(commit_id, root=None):
+
+    return set(commit_walk(commit_id, root))
+
+
+def commit_walk(start, root=None):
+
+    pending = [start] if start else []
+    visited = set()
+
+    while pending:
+        commit_id = pending.pop()
+        if commit_id in visited:
+            continue
+
+        visited.add(commit_id)
+        yield commit_id
+
+        data = load_commit(commit_id, root)
+        parent = data.get("parent")
+        merge_parent = data.get("merge_parent")
+        if parent:
+            pending.append(parent)
+        if merge_parent:
+            pending.append(merge_parent)
+
+
+def write_working_tree(target_tree, root=None):
+    """Materialise a tracked tree after local-change protection has run."""
+
+    root = Path(root or Path.cwd()).resolve()
+    existing_tree = current_tree(root)
+
+    for path in set(existing_tree) - set(target_tree):
+        file_path = root / path
+        if file_path.exists():
+            file_path.unlink()
+
+    for path, entry in target_tree.items():
+        destination = root / path
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(blob_path(entry["blob"], root), destination)
+
+
+def working_changes(root=None):
+    """Return tracked files whose working copy differs from the active branch."""
+
+    root = Path(root or Path.cwd()).resolve()
+    changes = []
+
+    for path, entry in current_tree(root).items():
+        file_path = root / path
+        if not file_path.exists() or file_path.read_bytes() != blob_path(entry["blob"], root).read_bytes():
+            changes.append(path)
+
+    return sorted(changes)
+
+
+def normalise_relative_path(file_path, root):
+
+    source = Path(file_path).resolve()
+    try:
+        return source.relative_to(root).as_posix()
+    except ValueError as error:
+        raise RepositoryError("Only files inside this repository can be used.") from error
 
 
 def store_blob(source, root=None):
