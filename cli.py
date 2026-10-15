@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 from commands import (
     init_command,
     add_command,
@@ -77,16 +78,18 @@ def run():
 
 def print_usage():
 
+    program = Path(sys.argv[0]).name
+
     print("Usage:")
-    print("  python main.py init")
-    print("  python main.py status")
-    print("  python main.py branch [name]")
-    print("  python main.py checkout [-f] <branch>")
-    print("  python main.py add <file.gdfx>")
-    print("  python main.py diff <file.gdfx>")
-    print("  python main.py rm <file>")
-    print("  python main.py restore <file>")
-    print("  python main.py commit -m \"message\"")
-    print("  python main.py log")
-    print("  python main.py merge <branch>")
-    print("  python main.py compare <old.gdfx> <new.gdfx>")
+    print(f"  {program} init")
+    print(f"  {program} status")
+    print(f"  {program} branch [name]")
+    print(f"  {program} checkout [-f] <branch>")
+    print(f"  {program} add <file.gdfx>")
+    print(f"  {program} diff <file.gdfx>")
+    print(f"  {program} rm <file>")
+    print(f"  {program} restore <file>")
+    print(f"  {program} commit -m \"message\"")
+    print(f"  {program} log")
+    print(f"  {program} merge <branch>")
+    print(f"  {program} compare <old.gdfx> <new.gdfx>")

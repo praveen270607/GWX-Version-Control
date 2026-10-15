@@ -16,6 +16,15 @@ Instead of comparing raw XML files, it understands GraphWorX engineering concept
 
 ## Current local workflow
 
+### Windows users without Python
+
+Download the `GWX-Version-Control-v*-windows.zip` asset from the project's
+GitHub Releases page, extract it, and run `gwx.exe`. The portable release does
+not require Python, pip, Git, or a GitHub account. See
+[`INSTALL-WINDOWS.txt`](INSTALL-WINDOWS.txt) in the ZIP for details.
+
+### Python installation
+
 Install the command in a virtual environment:
 
 ```powershell
