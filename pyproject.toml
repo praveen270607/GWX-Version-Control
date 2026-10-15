@@ -4,9 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gwx-version-control"
-version = "0.1.0"
+version = "0.1.1"
 description = "Semantic local version control for ICONICS GraphWorX files"
 requires-python = ">=3.10"
+
+[project.optional-dependencies]
+build = ["pyinstaller>=6.0"]
 
 [project.scripts]
 gwx = "cli:run"

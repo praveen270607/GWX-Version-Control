@@ -1,0 +1,18 @@
+GWX Version Control for Windows
+===============================
+
+1. Extract this ZIP file to a folder you can write to, for example:
+   C:\Tools\GWX-Version-Control
+
+2. Open Command Prompt or PowerShell in a GraphWorX project folder.
+
+3. Run the executable using its full path, for example:
+   C:\Tools\GWX-Version-Control\gwx.exe init
+
+You do not need Python, pip, Git, or a GitHub account to run gwx.exe.
+
+To make the command available everywhere, add the extraction folder to your
+Windows PATH environment variable.
+
+For command help, run:
+   gwx.exe
