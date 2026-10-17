@@ -52,6 +52,16 @@ cannot silently overwrite a colleague's committed display. `checkout` restores
 the selected branch's tracked files and refuses to overwrite local edits unless
 `-f` is explicitly used.
 
+### Commit IDs and file versions
+
+Repository commits use one global sequence (`000001`, `000002`, and so on),
+while each display or symbol has its own file version. For example, a display
+first added in commit `000001` is file version `1`; a symbol first added later
+in commit `000002` is also file version `1`. Updating only the display creates
+its file version `2` without changing the symbol's file version. Use `gwx
+status` to see each tracked file's version and last commit, and `gwx log` to
+see the per-file version changes made by each commit.
+
 ```powershell
 gwx checkout main
 gwx merge alarm-viewer
