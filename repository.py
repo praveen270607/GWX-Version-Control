@@ -42,7 +42,7 @@ def initialize_repository(root=None, announce=True):
     config = read_json(config_file) if config_file.exists() else {}
     config.update({
         "repository_name": root.name,
-        "format_version": 2,
+        "format_version": 3,
         "current_branch": current_branch(root)
     })
     write_json(config_file, config)
@@ -148,7 +148,7 @@ def checkout_branch(branch_name, root=None, force=False):
 
 
 def stage_file(file_path, root=None):
-    """Store a new immutable blob and record the branch revision it is based on."""
+    """Store a new blob and record the file version it is based on."""
 
     ensure_repository(root)
     root = Path(root or Path.cwd()).resolve()
@@ -164,19 +164,22 @@ def stage_file(file_path, root=None):
 
     blob_id = store_blob(source, root)
     tree = current_tree(root)
-    base_revision = tree.get(relative_path, {}).get("revision")
+    base_file_revision = file_revision(tree.get(relative_path))
     index = load_index(root)
 
     index[relative_path] = {
-        "base_revision": base_revision,
+        "base_file_revision": base_file_revision,
         "new_blob": blob_id
     }
     save_index(index, root)
 
-    if base_revision is None:
+    if base_file_revision is None:
         print(f"Staged new file: {relative_path}")
     else:
-        print(f"Staged update to {relative_path} based on revision {base_revision}.")
+        print(
+            f"Staged update to {relative_path} "
+            f"based on file version {base_file_revision}."
+        )
 
 
 def stage_remove(file_path, root=None):
@@ -192,7 +195,7 @@ def stage_remove(file_path, root=None):
 
     index = load_index(root)
     index[relative_path] = {
-        "base_revision": tree[relative_path]["revision"],
+        "base_file_revision": file_revision(tree[relative_path]),
         "new_blob": None
     }
     save_index(index, root)
@@ -214,15 +217,23 @@ def status(root=None):
     print(f"On branch {branch}")
     print(f"HEAD: {head}")
 
+    tree = current_tree(root)
+    if tree:
+        print("Tracked files:")
+        for path, entry in sorted(tree.items()):
+            print(
+                f"  {path} (file version: {file_revision(entry)}, "
+                f"last commit: {last_commit(entry)})"
+            )
+
     if not index:
         print("Nothing staged.")
-        return
-
-    print("Staged changes:")
-    for path, entry in sorted(index.items()):
-        base = entry["base_revision"] or "new file"
-        action = "delete" if entry["new_blob"] is None else "update"
-        print(f"  {action}: {path} (base: {base})")
+    else:
+        print("Staged changes:")
+        for path, entry in sorted(index.items()):
+            base = staged_base_file_revision(entry) or "new file"
+            action = "delete" if entry["new_blob"] is None else "update"
+            print(f"  {action}: {path} (base file version: {base})")
 
     changed_files = working_changes(root)
     if changed_files:
@@ -232,7 +243,7 @@ def status(root=None):
 
 
 def commit(message, root=None):
-    """Commit staged files only if their recorded base revisions are current."""
+    """Commit staged files only if their recorded base file versions are current."""
 
     ensure_repository(root)
 
@@ -250,29 +261,47 @@ def commit(message, root=None):
 
         conflicts = []
         for path, entry in index.items():
-            current_revision = tree.get(path, {}).get("revision")
-            if current_revision != entry["base_revision"]:
-                conflicts.append((path, entry["base_revision"], current_revision))
+            current_revision = file_revision(tree.get(path))
+            base_revision = staged_base_file_revision(entry)
+            if current_revision != base_revision:
+                conflicts.append((path, base_revision, current_revision))
 
         if conflicts:
             details = "; ".join(
-                f"{path}: staged from {base or 'new file'}, current is {current or 'new file'}"
+                f"{path}: staged from file version {base or 'new'}, "
+                f"current is {current or 'new'}"
                 for path, base, current in conflicts
             )
             raise RepositoryError(
-                "Commit rejected because the staged base revision is no longer current. "
+                "Commit rejected because the staged base file version is no longer current. "
                 f"Re-compare and stage again. {details}"
             )
 
         commit_id = next_commit_id(root)
+        changes = []
         for path, entry in index.items():
+            previous_version = file_revision(tree.get(path)) or 0
             if entry["new_blob"] is None:
                 tree.pop(path, None)
+                changes.append({
+                    "path": path,
+                    "action": "delete",
+                    "from_file_version": previous_version,
+                    "to_file_version": None
+                })
             else:
+                next_file_version = previous_version + 1
                 tree[path] = {
                     "blob": entry["new_blob"],
-                    "revision": commit_id
+                    "file_revision": next_file_version,
+                    "last_commit": commit_id
                 }
+                changes.append({
+                    "path": path,
+                    "action": "add" if previous_version == 0 else "update",
+                    "from_file_version": previous_version or None,
+                    "to_file_version": next_file_version
+                })
 
         commit_data = {
             "id": commit_id,
@@ -280,6 +309,7 @@ def commit(message, root=None):
             "branch": branch,
             "message": message,
             "created_at": datetime.now(timezone.utc).isoformat(),
+            "changes": changes,
             "tree": tree
         }
         write_json(repository_path(root) / "commits" / f"{commit_id}.json", commit_data)
@@ -301,6 +331,12 @@ def show_log(root=None):
     while commit_id is not None:
         data = load_commit(commit_id, root)
         print(f"{data['id']} {data['created_at']} {data['message']}")
+        for change in data.get("changes", describe_changes(data, root)):
+            print(
+                f"  {change['action']}: {change['path']} "
+                f"(file version {change['from_file_version'] or '-'} "
+                f"-> {change['to_file_version'] or '-'})"
+            )
         commit_id = data.get("parent")
 
 
@@ -322,7 +358,10 @@ def restore_file(file_path, root=None):
     destination = root / relative_path
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(blob_path(entry["blob"], root), destination)
-    print(f"Restored {relative_path} from revision {entry['revision']}.")
+    print(
+        f"Restored {relative_path} from file version {file_revision(entry)} "
+        f"(commit {last_commit(entry)})."
+    )
 
 
 def staged_comparison_paths(file_path, root=None):
@@ -341,12 +380,68 @@ def staged_comparison_paths(file_path, root=None):
     if entry is None:
         raise RepositoryError("File is not staged. Run add before diff.")
 
-    if entry["base_revision"] is None:
+    if staged_base_file_revision(entry) is None:
         raise RepositoryError("This is a new file; it has no previous version to compare.")
 
     tree = current_tree(root)
     old_blob = tree[relative_path]["blob"]
     return blob_path(old_blob, root), blob_path(entry["new_blob"], root)
+
+
+def file_revision(entry):
+    """Return a file-local revision, including compatibility with format 2 trees."""
+
+    if entry is None:
+        return None
+
+    if "file_revision" in entry:
+        return entry["file_revision"]
+
+    # Version 2 recorded only the commit that last changed a file. A file that
+    # exists in that format is treated as version 1 when the repository upgrades.
+    return 1
+
+
+def last_commit(entry):
+
+    if entry is None:
+        return None
+
+    return entry.get("last_commit", entry.get("revision"))
+
+
+def staged_base_file_revision(entry):
+    """Read format 3 index data, with a safe fallback for an old empty base."""
+
+    if "base_file_revision" in entry:
+        return entry["base_file_revision"]
+
+    # An old staged item is deliberately treated as stale when it targeted an
+    # existing format 2 file. The user must stage it again after upgrading.
+    return None if entry.get("base_revision") is None else "stale-format-2"
+
+
+def describe_changes(commit_data, root=None):
+    """Derive a readable change list for commits created before format 3."""
+
+    before = load_tree(commit_data.get("parent"), root)
+    after = commit_data["tree"]
+    changes = []
+
+    for path in sorted(set(before) | set(after)):
+        old_entry = before.get(path)
+        new_entry = after.get(path)
+        if entry_blob(old_entry) == entry_blob(new_entry):
+            continue
+
+        changes.append({
+            "path": path,
+            "action": "delete" if new_entry is None else "add" if old_entry is None else "update",
+            "from_file_version": file_revision(old_entry),
+            "to_file_version": file_revision(new_entry)
+        })
+
+    return changes
 
 
 def current_tree(root=None):
