@@ -1,4 +1,4 @@
-from models import DisplayObject
+from models import DisplayObject, DynamicObject
 from dynamic_parser import parse_dynamic
 import xml.etree.ElementTree as ET
 
@@ -86,26 +86,35 @@ def create_display_object(xml_element, parent_path=""):
                 f"[{child_counts[child_type]}]"
             )
 
-        # Is this child actually a GraphWorX Dynamic?
-        if is_dynamic_element(child_type):
+        # Collect every real dynamics inside this child or dynamic group
+        if is_dynamic_element(child_type):    
+            real_dynamic_tags = {
+                "GwxPick",
+                "GwxAnimation",
+                "GwxHide",
+                "GwxColor",
+                "GwxRotation",
+                "GwxResize",
+                "GwxProcessPoint",
+            }
 
-            dynamic = parse_dynamic(child)
+            for element in child.iter():
+                if clean_tag(element.tag) in real_dynamic_tags:
+                    dynamic = parse_dynamic(element)
 
-            if dynamic is not None:
-                obj.add_dynamic(dynamic)
+                    if dynamic is not None:
+                        obj.add_dynamic(dynamic)
+            continue            
 
-            continue
 
-        else:
+        child_object = create_display_object(child, child_path)
 
-            child_object = create_display_object(child, child_path)
+        # Tell the child who its parent is
+        child_object.parent = obj
+        child_object.parent_id = obj.object_id
 
-            # Tell the child who its parent is
-            child_object.parent = obj
-            child_object.parent_id = obj.object_id
-
-            # Add the child to the parent's list
-            obj.children.append(child_object)
+        # Add the child to the parent's list
+        obj.children.append(child_object)
 
     return obj
 
