@@ -15,6 +15,7 @@ from repository import (
 from parser import parse_gdfx
 from lookup import build_lookup
 from compare_engine import compare_objects
+from pdf_export import export_comparison_pdf
 
 def init_command():
     """
@@ -199,6 +200,39 @@ def compare_command(old_file, new_file):
                     print(f"{YELLOW}  {difference}{RESET}")
 
     print()
+
+    while True:
+        answer = input(
+            "Export this change record to PDF? (y/n): "
+        ).strip().lower()
+
+        if answer in ("y", "yes"):
+            filename = input(
+                "Enter PDF filename (press Enter for change_record.pdf): "
+            ).strip()
+
+            if not filename:
+                filename = "change_record.pdf"
+            elif not filename.lower().endswith(".pdf"):
+                filename += ".pdf"
+
+            try:
+                export_comparison_pdf(
+                    comparison_result,
+                    filename
+                )
+            except Exception as error:
+                print(f"PDF export failed: {error}")
+
+            break
+
+        elif answer in ("n", "no"):
+            print("PDF export skipped.")
+            break
+
+        else:
+            print("Please enter y or n.")
+
 
     # Unchanged Objects - disabled for now
     # print("Unchanged Objects")
